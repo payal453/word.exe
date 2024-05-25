@@ -60,7 +60,7 @@ struct Node* pop(struct Stack* stack) {
 void postorderTraversal(struct Node* root) {
     if (root == NULL)
         return;
-    
+
     struct Stack* stack1 = createStack(100);
     struct Stack* stack2 = createStack(100);
     push(stack1, root);
@@ -81,11 +81,50 @@ void postorderTraversal(struct Node* root) {
     }
 }
 
+// Function to perform inorder traversal iteratively
+void inorderTraversal(struct Node* root) {
+    if (root == NULL)
+        return;
+
+    struct Stack* stack = createStack(100);
+    struct Node* current = root;
+
+    while (current != NULL || !isEmpty(stack)) {
+        while (current != NULL) {
+            push(stack, current);
+            current = current->left;
+        }
+
+        current = pop(stack);
+        printf("%d ", current->data);
+        current = current->right;
+    }
+}
+
+// Function to perform preorder traversal iteratively
+void preorderTraversal(struct Node* root) {
+    if (root == NULL)
+        return;
+
+    struct Stack* stack = createStack(100);
+    push(stack, root);
+
+    while (!isEmpty(stack)) {
+        struct Node* temp = pop(stack);
+        printf("%d ", temp->data);
+
+        if (temp->right)
+            push(stack, temp->right);
+        if (temp->left)
+            push(stack, temp->left);
+    }
+}
+
 // Function to display leaf nodes of the tree
 void displayLeafNodes(struct Node* root) {
     if (root == NULL)
         return;
-    
+
     struct Stack* stack = createStack(100);
     push(stack, root);
 
@@ -94,7 +133,7 @@ void displayLeafNodes(struct Node* root) {
 
         if (temp->left == NULL && temp->right == NULL)
             printf("%d ", temp->data);
-        
+
         if (temp->right)
             push(stack, temp->right);
         if (temp->left)
@@ -136,6 +175,14 @@ int main() {
     postorderTraversal(root);
     printf("\n");
 
+    printf("Inorder Traversal: ");
+    inorderTraversal(root);
+    printf("\n");
+
+    printf("Preorder Traversal: ");
+    preorderTraversal(root);
+    printf("\n");
+
     printf("Leaf Nodes: ");
     displayLeafNodes(root);
     printf("\n");
@@ -144,6 +191,14 @@ int main() {
     mirrorTree(root);
     printf("Postorder Traversal of Mirror Image: ");
     postorderTraversal(root);
+    printf("\n");
+
+    printf("Inorder Traversal of Mirror Image: ");
+    inorderTraversal(root);
+    printf("\n");
+
+    printf("Preorder Traversal of Mirror Image: ");
+    preorderTraversal(root);
     printf("\n");
 
     return 0;
