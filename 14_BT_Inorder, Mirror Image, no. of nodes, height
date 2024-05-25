@@ -1,0 +1,140 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definition for a binary tree node
+struct node {
+    int item;
+    struct node *left, *right;
+};
+
+// Function to create a new tree node
+struct node *createNode(int value) {
+    struct node *newNode = (struct node *)malloc(sizeof(struct node));
+    newNode->item = value;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node on the left of the node
+struct node *insertLeft(struct node *root, int value) {
+    root->left = createNode(value);
+    return root->left;
+}
+
+// Function to insert a node on the right of the node
+struct node *insertRight(struct node *root, int value) {
+    root->right = createNode(value);
+    return root->right;
+}
+
+// Function to perform non-recursive inorder traversal
+void inorderTraversal(struct node *root) {
+    if (root == NULL) return;
+
+    struct node *stack[100];
+    int top = -1;
+    struct node *current = root;
+
+    while (current != NULL || top != -1)
+        {
+        while (current != NULL)
+        {
+            stack[++top] = current;
+            current = current->left;
+        }
+        current = stack[top--];
+        printf("%d -> ", current->item);
+        current = current->right;
+    }
+    printf("\n");
+}
+
+// Function to create the mirror image of the tree non-recursively
+void mirrorImage(struct node *root) {
+    if (root == NULL) return;
+
+    struct node *stack[100];
+    int top = -1;
+    struct node *current = root;
+
+    stack[++top] = root;
+    while (top != -1) {
+        current = stack[top--];
+
+        // Swap the left and right children
+        struct node *temp = current->left;
+        current->left = current->right;
+        current->right = temp;
+
+        if (current->left) stack[++top] = current->left;
+        if (current->right) stack[++top] = current->right;
+    }
+}
+
+// Function to count the total number of nodes non-recursively
+int countTotalNodes(struct node *root) {
+    if (root == NULL) return 0;
+
+    struct node *stack[100];
+    int top = -1;
+    int count = 0;
+    struct node *current = root;
+
+    stack[++top] = root;
+    while (top != -1) {
+        current = stack[top--];
+        count++;
+
+        if (current->left) stack[++top] = current->left;
+        if (current->right) stack[++top] = current->right;
+    }
+    return count;
+}
+
+// Function to display the height of the tree non-recursively
+int treeHeight(struct node *root) {
+    if (root == NULL) return 0;
+
+    struct node *queue[100];
+    int front = 0, rear = 0;
+    int height = 0;
+
+    queue[rear++] = root;
+    while (front < rear) {
+        int nodeCount = rear - front;
+        height++;
+
+        while (nodeCount > 0) {
+            struct node *node = queue[front++];
+            if (node->left) queue[rear++] = node->left;
+            if (node->right) queue[rear++] = node->right;
+            nodeCount--;
+        }
+    }
+    return height;
+}
+
+int main() {
+    struct node *root = createNode(1);
+    insertLeft(root, 2);
+    insertRight(root, 3);
+    insertLeft(root->left, 4);
+    insertRight(root->left, 5);
+    insertLeft(root->right, 6);
+    insertRight(root->right, 7);
+
+    printf("Non-recursive Inorder Traversal:\n");
+    inorderTraversal(root);
+
+    printf("Non-recursive Mirror Image Inorder Traversal:\n");
+    mirrorImage(root);
+    inorderTraversal(root);
+
+    // Restore original tree structure for further operations
+    mirrorImage(root);
+
+    printf("Total number of nodes: %d\n", countTotalNodes(root));
+    printf("Height of the tree: %d\n", treeHeight(root));
+
+    return 0;
+}
