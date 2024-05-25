@@ -1,0 +1,248 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definition of the node structure
+typedef struct Node {
+    int data;
+    struct Node *left, *right;
+} Node;
+
+// Queue structure for level order traversal
+typedef struct Queue {
+    Node* data;
+    struct Queue* next;
+} Queue;
+
+// Function prototypes
+Node* createNode(int data);
+Node* insertNode(Node* root, int data);
+void postorderTraversal(Node* root);
+void displayLeafNodes(Node* root);
+int countLeafNodes(Node* root);
+int treeHeight(Node* root);
+void enqueue(Queue** front, Queue** rear, Node* node);
+Node* dequeue(Queue** front, Queue** rear);
+
+// Create a new node
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Insert a node into the tree
+Node* insertNode(Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    Node* current = root;
+    Node* parent = NULL;
+
+    while (current != NULL) {
+        parent = current;
+        if (data < current->data) {
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+
+    if (data < parent->data) {
+        parent->left = createNode(data);
+    } else {
+        parent->right = createNode(data);
+    }
+
+    return root;
+}
+
+// Non-recursive postorder traversal
+void postorderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    Node* stack1[100];
+    Node* stack2[100];
+    int top1 = -1;
+    int top2 = -1;
+
+    stack1[++top1] = root;
+
+    while (top1 != -1) {
+        Node* current = stack1[top1--];
+        stack2[++top2] = current;
+
+        if (current->left) {
+            stack1[++top1] = current->left;
+        }
+        if (current->right) {
+            stack1[++top1] = current->right;
+        }
+    }
+
+    while (top2 != -1) {
+        printf("%d ", stack2[top2--]->data);
+    }
+    printf("\n");
+}
+
+// Display leaf nodes non-recursively
+void displayLeafNodes(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    Node* stack[100];
+    int top = -1;
+
+    stack[++top] = root;
+
+    while (top != -1) {
+        Node* current = stack[top--];
+
+        if (current->left == NULL && current->right == NULL) {
+            printf("%d ", current->data);
+        }
+
+        if (current->right) {
+            stack[++top] = current->right;
+        }
+        if (current->left) {
+            stack[++top] = current->left;
+        }
+    }
+    printf("\n");
+}
+
+// Count leaf nodes non-recursively
+int countLeafNodes(Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+
+    int count = 0;
+    Node* stack[100];
+    int top = -1;
+
+    stack[++top] = root;
+
+    while (top != -1) {
+        Node* current = stack[top--];
+
+        if (current->left == NULL && current->right == NULL) {
+            count++;
+        }
+
+        if (current->right) {
+            stack[++top] = current->right;
+        }
+        if (current->left) {
+            stack[++top] = current->left;
+        }
+    }
+
+    return count;
+}
+
+// Display height of tree non-recursively
+int treeHeight(Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+
+    Queue* front = NULL;
+    Queue* rear = NULL;
+
+    enqueue(&front, &rear, root);
+    int height = 0;
+
+    while (1) {
+        int nodeCount = 0;
+        Queue* temp = front;
+
+        while (temp != NULL) {
+            nodeCount++;
+            temp = temp->next;
+        }
+
+        if (nodeCount == 0) {
+            return height;
+        }
+
+        height++;
+
+        while (nodeCount > 0) {
+            Node* current = dequeue(&front, &rear);
+
+            if (current->left) {
+                enqueue(&front, &rear, current->left);
+            }
+
+            if (current->right) {
+                enqueue(&front, &rear, current->right);
+            }
+
+            nodeCount--;
+        }
+    }
+}
+
+// Enqueue function for level order traversal
+void enqueue(Queue** front, Queue** rear, Node* node) {
+    Queue* temp = (Queue*)malloc(sizeof(Queue));
+    temp->data = node;
+    temp->next = NULL;
+
+    if (*rear == NULL) {
+        *front = *rear = temp;
+        return;
+    }
+
+    (*rear)->next = temp;
+    *rear = temp;
+}
+
+// Dequeue function for level order traversal
+Node* dequeue(Queue** front, Queue** rear) {
+    if (*front == NULL) {
+        return NULL;
+    }
+
+    Queue* temp = *front;
+    Node* node = temp->data;
+    *front = (*front)->next;
+
+    if (*front == NULL) {
+        *rear = NULL;
+    }
+
+    free(temp);
+    return node;
+}
+
+// Main function
+int main() {
+    Node* root = NULL;
+
+    root = insertNode(root, 10);
+    root = insertNode(root, 5);
+    root = insertNode(root, 15);
+    root = insertNode(root, 3);
+    root = insertNode(root, 7);
+    root = insertNode(root, 12);
+    root = insertNode(root, 18);
+
+    printf("Postorder Traversal: ");
+    postorderTraversal(root);
+
+    printf("Leaf nodes: ");
+    displayLeafNodes(root);
+
+    printf("Number of leaf nodes: %d\n", countLeafNodes(root));
+    printf("Height of the tree: %d\n", treeHeight(root));
+
+    return 0;
+}
