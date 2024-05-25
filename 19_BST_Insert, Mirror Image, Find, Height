@@ -1,0 +1,178 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definition for a binary tree node.
+struct node {
+    int data;
+    struct node *left, *right;
+};
+
+// Function to create a new tree node.
+struct node *newNode(int val) {
+    struct node *temp = (struct node *)malloc(sizeof(struct node));
+    temp->data = val;
+    temp->left = temp->right = NULL;
+    return temp;
+}
+
+// Function to insert a node into the binary search tree.
+struct node *insert(struct node *root, int val) {
+    if (root == NULL) {
+        return newNode(val);
+    }
+    if (val < root->data) {
+        root->left = insert(root->left, val);
+    } else {
+        root->right = insert(root->right, val);
+    }
+    return root;
+}
+
+// Function to create the mirror image of the tree.
+void mirror(struct node *root) {
+    struct node *stack[100];
+    int top = -1;
+    struct node *current = root;
+
+    if (root == NULL) return;
+
+    stack[++top] = root;
+    while (top != -1) {
+        current = stack[top--];
+        struct node *temp = current->left;
+        current->left = current->right;
+        current->right = temp;
+
+        if (current->left) {
+            stack[++top] = current->left;
+        }
+        if (current->right) {
+            stack[++top] = current->right;
+        }
+    }
+}
+
+// Function to find a node in the BST.
+struct node *find(struct node *root, int val) {
+    while (root != NULL) {
+        if (val == root->data) {
+            return root;
+        } else if (val < root->data) {
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+    return NULL;
+}
+
+// Function to display the height of the tree.
+int height(struct node *root) {
+    if (root == NULL) return 0;
+
+    struct node *queue[100];
+    int front = 0, rear = 0;
+    int height = 0;
+
+    queue[rear++] = root;
+    while (front < rear) {
+        int nodeCount = rear - front;
+        height++;
+
+        while (nodeCount > 0) {
+            struct node *node = queue[front++];
+            if (node->left) queue[rear++] = node->left;
+            if (node->right) queue[rear++] = node->right;
+            nodeCount--;
+        }
+    }
+    return height;
+}
+
+// Function to perform in-order traversal of the tree.
+void inOrderTraversal(struct node *root) {
+    if (root == NULL) return;
+
+    struct node *stack[100];
+    int top = -1;
+    struct node *current = root;
+
+    while (current != NULL || top != -1) {
+        while (current != NULL) {
+            stack[++top] = current;
+            current = current->left;
+        }
+
+        current = stack[top--];
+        printf("%d ", current->data);
+        current = current->right;
+    }
+}
+
+// Function to display the menu and handle user choices.
+void menu() {
+    struct node *root = NULL;
+    int choice, val;
+    struct node *foundNode;
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert\n");
+        printf("2. Mirror Image\n");
+        printf("3. Find\n");
+        printf("4. Height of the tree\n");
+        printf("5. Display Tree\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value to insert: ");
+                scanf("%d", &val);
+                root = insert(root, val);
+                printf("%d inserted into the BST.\n", val);
+                break;
+            case 2:
+                printf("Original Tree (In-order): ");
+                inOrderTraversal(root);
+                printf("\n");
+
+                mirror(root);
+                printf("Mirror image of the BST created.\n");
+
+                printf("Mirrored Tree (In-order): ");
+                inOrderTraversal(root);
+                printf("\n");
+                break;
+            case 3:
+                printf("Enter value to find: ");
+                scanf("%d", &val);
+                foundNode = find(root, val);
+                if (foundNode != NULL) {
+                    printf("Value %d found in the BST.\n", val);
+                } else {
+                    printf("Value %d not found in the BST.\n", val);
+                }
+                break;
+            case 4:
+                printf("Height of the BST is %d.\n", height(root));
+                break;
+            case 5:
+                printf("Tree (In-order): ");
+                inOrderTraversal(root);
+                printf("\n");
+                break;
+            case 6:
+                printf("Exiting...\n");
+                return;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
+}
+
+int main() {
+    menu();
+    return 0;
+}
