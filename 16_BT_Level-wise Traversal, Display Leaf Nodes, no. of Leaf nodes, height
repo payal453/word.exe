@@ -1,0 +1,203 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a structure for a binary tree node
+typedef struct TreeNode {
+    int value;
+    struct TreeNode* left;
+    struct TreeNode* right;
+} TreeNode;
+
+// Define a structure for a queue node
+typedef struct QueueNode {
+    TreeNode* treeNode;
+    struct QueueNode* next;
+} QueueNode;
+
+// Define a structure for the queue
+typedef struct Queue {
+    QueueNode* front;
+    QueueNode* rear;
+} Queue;
+
+// Function to create a new tree node
+TreeNode* createTreeNode(int value) {
+    TreeNode* newNode = (TreeNode*)malloc(sizeof(TreeNode));
+    newNode->value = value;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Function to create a new queue node
+QueueNode* createQueueNode(TreeNode* treeNode) {
+    QueueNode* newNode = (QueueNode*)malloc(sizeof(QueueNode));
+    newNode->treeNode = treeNode;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to initialize a queue
+Queue* createQueue() {
+    Queue* queue = (Queue*)malloc(sizeof(Queue));
+    queue->front = queue->rear = NULL;
+    return queue;
+}
+
+// Function to enqueue a tree node to the queue
+void enqueue(Queue* queue, TreeNode* treeNode) {
+    QueueNode* newNode = createQueueNode(treeNode);
+    if (queue->rear == NULL) {
+        queue->front = queue->rear = newNode;
+        return;
+    }
+    queue->rear->next = newNode;
+    queue->rear = newNode;
+}
+
+// Function to dequeue a tree node from the queue
+TreeNode* dequeue(Queue* queue) {
+    if (queue->front == NULL)
+        return NULL;
+    QueueNode* temp = queue->front;
+    queue->front = queue->front->next;
+    if (queue->front == NULL)
+        queue->rear = NULL;
+    TreeNode* treeNode = temp->treeNode;
+    free(temp);
+    return treeNode;
+}
+
+// Function to check if the queue is empty
+int isQueueEmpty(Queue* queue) {
+    return queue->front == NULL;
+}
+
+// Function to insert a node into the binary tree
+void insert(TreeNode** root, int value) {
+    TreeNode* newNode = createTreeNode(value);
+    if (*root == NULL) {
+        *root = newNode;
+        return;
+    }
+    Queue* queue = createQueue();
+    enqueue(queue, *root);
+    while (!isQueueEmpty(queue)) {
+        TreeNode* node = dequeue(queue);
+        if (node->left == NULL) {
+            node->left = newNode;
+            break;
+        } else {
+            enqueue(queue, node->left);
+        }
+        if (node->right == NULL) {
+            node->right = newNode;
+            break;
+        } else {
+            enqueue(queue, node->right);
+        }
+    }
+}
+
+// Function for level-wise traversal
+void levelOrderTraversal(TreeNode* root) {
+    if (root == NULL)
+        return;
+    Queue* queue = createQueue();
+    enqueue(queue, root);
+    while (!isQueueEmpty(queue)) {
+        TreeNode* node = dequeue(queue);
+        printf("%d ", node->value);
+        if (node->left)
+            enqueue(queue, node->left);
+        if (node->right)
+            enqueue(queue, node->right);
+    }
+}
+
+// Function to display leaf nodes
+void displayLeafNodes(TreeNode* root) {
+    if (root == NULL)
+        return;
+    Queue* queue = createQueue();
+    enqueue(queue, root);
+    while (!isQueueEmpty(queue)) {
+        TreeNode* node = dequeue(queue);
+        if (node->left == NULL && node->right == NULL) {
+            printf("%d ", node->value);
+        }
+        if (node->left)
+            enqueue(queue, node->left);
+        if (node->right)
+            enqueue(queue, node->right);
+    }
+}
+
+// Function to count the total number of leaf nodes
+int countLeafNodes(TreeNode* root) {
+    if (root == NULL)
+        return 0;
+    int leafCount = 0;
+    Queue* queue = createQueue();
+    enqueue(queue, root);
+    while (!isQueueEmpty(queue)) {
+        TreeNode* node = dequeue(queue);
+        if (node->left == NULL && node->right == NULL) {
+            leafCount++;
+        }
+        if (node->left)
+            enqueue(queue, node->left);
+        if (node->right)
+            enqueue(queue, node->right);
+    }
+    return leafCount;
+}
+
+// Function to display the height of the tree
+int height(TreeNode* root) {
+    if (root == NULL)
+        return 0;
+    int height = 0;
+    Queue* queue = createQueue();
+    enqueue(queue, root);
+    while (!isQueueEmpty(queue)) {
+        int nodeCount = 0;
+        Queue* tempQueue = createQueue();
+        while (!isQueueEmpty(queue)) {
+            TreeNode* node = dequeue(queue);
+            if (node->left)
+                enqueue(tempQueue, node->left);
+            if (node->right)
+                enqueue(tempQueue, node->right);
+            nodeCount++;
+        }
+        if (nodeCount > 0)
+            height++;
+        free(queue);
+        queue = tempQueue;
+    }
+    return height;
+}
+
+// Main function to demonstrate the operations
+int main() {
+    TreeNode* root = NULL;
+    int nodes[] = {1, 2, 3, 4, 5, 6, 7};
+    int n = sizeof(nodes) / sizeof(nodes[0]);
+    for (int i = 0; i < n; i++) {
+        insert(&root, nodes[i]);
+    }
+
+    printf("Level-wise Traversal: ");
+    levelOrderTraversal(root);
+    printf("\n");
+
+    printf("Leaf Nodes: ");
+    displayLeafNodes(root);
+    printf("\n");
+
+    printf("Total Number of Leaf Nodes: %d\n", countLeafNodes(root));
+    printf("Height of Tree: %d\n", height(root));
+
+    return 0;
+}
