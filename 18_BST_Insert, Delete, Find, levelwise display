@@ -1,0 +1,214 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+typedef struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+} Node;
+
+// Queue structure for level order traversal
+typedef struct Queue {
+    Node* data;
+    struct Queue* next;
+} Queue;
+
+// Function prototypes
+Node* createNode(int data);
+Node* insertNode(Node* root, int data);
+Node* deleteNode(Node* root, int data);
+Node* findNode(Node* root, int data);
+void levelOrderTraversal(Node* root);
+Node* minValueNode(Node* node);
+void enqueue(Queue** front, Queue** rear, Node* node);
+Node* dequeue(Queue** front, Queue** rear);
+
+// Function to create a new node
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node into the BST
+Node* insertNode(Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insertNode(root->left, data);
+    } else if (data > root->data) {
+        root->right = insertNode(root->right, data);
+    }
+
+    return root;
+}
+
+// Function to delete a node from the BST
+Node* deleteNode(Node* root, int data) {
+    if (root == NULL) {
+        return root;
+    }
+
+    if (data < root->data) {
+        root->left = deleteNode(root->left, data);
+    } else if (data > root->data) {
+        root->right = deleteNode(root->right, data);
+    } else {
+        // Node with only one child or no child
+        if (root->left == NULL) {
+            Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        // Node with two children
+        Node* temp = minValueNode(root->right);
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+
+    return root;
+}
+
+// Function to find the minimum value node in a BST
+Node* minValueNode(Node* node) {
+    Node* current = node;
+
+    while (current && current->left != NULL) {
+        current = current->left;
+    }
+
+    return current;
+}
+
+// Function to find a node in the BST
+Node* findNode(Node* root, int data) {
+    while (root != NULL) {
+        if (data < root->data) {
+            root = root->left;
+        } else if (data > root->data) {
+            root = root->right;
+        } else {
+            return root;
+        }
+    }
+    return NULL;
+}
+
+// Function to perform level order traversal
+void levelOrderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    Queue* front = NULL;
+    Queue* rear = NULL;
+    enqueue(&front, &rear, root);
+
+    while (front != NULL) {
+        Node* current = dequeue(&front, &rear);
+
+        printf("%d ", current->data);
+
+        if (current->left != NULL) {
+            enqueue(&front, &rear, current->left);
+        }
+
+        if (current->right != NULL) {
+            enqueue(&front, &rear, current->right);
+        }
+    }
+    printf("\n");
+}
+
+// Function to enqueue a node
+void enqueue(Queue** front, Queue** rear, Node* node) {
+    Queue* temp = (Queue*)malloc(sizeof(Queue));
+    temp->data = node;
+    temp->next = NULL;
+
+    if (*rear == NULL) {
+        *front = *rear = temp;
+        return;
+    }
+
+    (*rear)->next = temp;
+    *rear = temp;
+}
+
+// Function to dequeue a node
+Node* dequeue(Queue** front, Queue** rear) {
+    if (*front == NULL) {
+        return NULL;
+    }
+
+    Queue* temp = *front;
+    Node* node = temp->data;
+    *front = (*front)->next;
+
+    if (*front == NULL) {
+        *rear = NULL;
+    }
+
+    free(temp);
+    return node;
+}
+
+// Main function to demonstrate the menu-driven operations
+int main() {
+    Node* root = NULL;
+    int choice, data;
+    Node* foundNode;
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert\n");
+        printf("2. Delete\n");
+        printf("3. Find\n");
+        printf("4. Level-wise Display\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter the data to insert: ");
+                scanf("%d", &data);
+                root = insertNode(root, data);
+                break;
+            case 2:
+                printf("Enter the data to delete: ");
+                scanf("%d", &data);
+                root = deleteNode(root, data);
+                break;
+            case 3:
+                printf("Enter the data to find: ");
+                scanf("%d", &data);
+                foundNode = findNode(root, data);
+                if (foundNode) {
+                    printf("Node found with data: %d\n", foundNode->data);
+                } else {
+                    printf("Node not found.\n");
+                }
+                break;
+            case 4:
+                printf("Level-wise Display:\n");
+                levelOrderTraversal(root);
+                break;
+            case 5:
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
