@@ -1,0 +1,215 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+typedef struct Node {
+    int data;
+    struct Node *left, *right;
+} Node;
+
+// Queue structure for level order traversal
+typedef struct Queue {
+    Node* data;
+    struct Queue* next;
+} Queue;
+
+// Function prototypes
+Node* createNode(int data);
+Node* insertNode(Node* root, int data);
+void levelOrderTraversal(Node* root);
+Node* mirrorImage(Node* root);
+int treeHeight(Node* root);
+void enqueue(Queue** front, Queue** rear, Node* node);
+Node* dequeue(Queue** front, Queue** rear);
+
+// Function to create a new node
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+// Function to insert a node into the binary tree
+Node* insertNode(Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    Node* current = root;
+    Node* parent = NULL;
+
+    while (current != NULL) {
+        parent = current;
+        if (data < current->data) {
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+
+    if (data < parent->data) {
+        parent->left = createNode(data);
+    } else {
+        parent->right = createNode(data);
+    }
+
+    return root;
+}
+
+// Function to perform level order traversal
+void levelOrderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+
+    Queue* front = NULL;
+    Queue* rear = NULL;
+    enqueue(&front, &rear, root);
+
+    while (front != NULL) {
+        Node* current = dequeue(&front, &rear);
+
+        printf("%d ", current->data);
+
+        if (current->left != NULL) {
+            enqueue(&front, &rear, current->left);
+        }
+
+        if (current->right != NULL) {
+            enqueue(&front, &rear, current->right);
+        }
+    }
+    printf("\n");
+}
+
+// Function to create the mirror image of the tree
+Node* mirrorImage(Node* root) {
+    if (root == NULL) {
+        return NULL;
+    }
+
+    Node* stack[100];
+    int top = -1;
+
+    stack[++top] = root;
+
+    while (top != -1) {
+        Node* current = stack[top--];
+
+        // Swap left and right children
+        Node* temp = current->left;
+        current->left = current->right;
+        current->right = temp;
+
+        // Push left and right children onto the stack
+        if (current->left != NULL) {
+            stack[++top] = current->left;
+        }
+        if (current->right != NULL) {
+            stack[++top] = current->right;
+        }
+    }
+
+    return root;
+}
+
+// Function to calculate the height of the tree
+int treeHeight(Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+
+    Queue* front = NULL;
+    Queue* rear = NULL;
+    enqueue(&front, &rear, root);
+    int height = 0;
+
+    while (1) {
+        int nodeCount = 0;
+        Queue* temp = front;
+
+        while (temp != NULL) {
+            nodeCount++;
+            temp = temp->next;
+        }
+
+        if (nodeCount == 0) {
+            return height;
+        }
+
+        height++;
+
+        while (nodeCount > 0) {
+            Node* current = dequeue(&front, &rear);
+
+            if (current->left != NULL) {
+                enqueue(&front, &rear, current->left);
+            }
+
+            if (current->right != NULL) {
+                enqueue(&front, &rear, current->right);
+            }
+
+            nodeCount--;
+        }
+    }
+}
+
+// Function to enqueue a node
+void enqueue(Queue** front, Queue** rear, Node* node) {
+    Queue* temp = (Queue*)malloc(sizeof(Queue));
+    temp->data = node;
+    temp->next = NULL;
+
+    if (*rear == NULL) {
+        *front = *rear = temp;
+        return;
+    }
+
+    (*rear)->next = temp;
+    *rear = temp;
+}
+
+// Function to dequeue a node
+Node* dequeue(Queue** front, Queue** rear) {
+    if (*front == NULL) {
+        return NULL;
+    }
+
+    Queue* temp = *front;
+    Node* node = temp->data;
+    *front = (*front)->next;
+
+    if (*front == NULL) {
+        *rear = NULL;
+    }
+
+    free(temp);
+    return node;
+}
+
+// Main function
+int main() {
+    Node* root = NULL;
+
+    root = insertNode(root, 10);
+    root = insertNode(root, 5);
+    root = insertNode(root, 15);
+    root = insertNode(root, 3);
+    root = insertNode(root, 7);
+    root = insertNode(root, 12);
+    root = insertNode(root, 18);
+
+    printf("Level order traversal: ");
+    levelOrderTraversal(root);
+
+    root = mirrorImage(root);
+
+    printf("Level order traversal after mirroring: ");
+    levelOrderTraversal(root);
+
+    printf("Height of the tree: %d\n", treeHeight(root));
+
+    return 0;
+}
