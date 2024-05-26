@@ -226,23 +226,46 @@ Node* dequeue(Queue** front, Queue** rear) {
 // Main function
 int main() {
     Node* root = NULL;
+    int choice, value;
 
-    root = insertNode(root, 10);
-    root = insertNode(root, 5);
-    root = insertNode(root, 15);
-    root = insertNode(root, 3);
-    root = insertNode(root, 7);
-    root = insertNode(root, 12);
-    root = insertNode(root, 18);
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert Node\n");
+        printf("2. Postorder Traversal\n");
+        printf("3. Display Leaf Nodes\n");
+        printf("4. Count Leaf Nodes\n");
+        printf("5. Display Height of Tree\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    printf("Postorder Traversal: ");
-    postorderTraversal(root);
-
-    printf("Leaf nodes: ");
-    displayLeafNodes(root);
-
-    printf("Number of leaf nodes: %d\n", countLeafNodes(root));
-    printf("Height of the tree: %d\n", treeHeight(root));
+        switch (choice) {
+            case 1:
+                printf("Enter value to insert: ");
+                scanf("%d", &value);
+                root = insertNode(root, value);
+                break;
+            case 2:
+                printf("Postorder Traversal: ");
+                postorderTraversal(root);
+                break;
+            case 3:
+                printf("Leaf Nodes: ");
+                displayLeafNodes(root);
+                break;
+            case 4:
+                printf("Total Number of Leaf Nodes: %d\n", countLeafNodes(root));
+                break;
+            case 5:
+                printf("Height of Tree: %d\n", treeHeight(root));
+                break;
+            case 6:
+                exit(0);
+                break;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
 
     return 0;
 }
