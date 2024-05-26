@@ -1,132 +1,174 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
 
-#define MAX 100
+#define max 100
+int stack[max],n;
+int top = -1;
 
-int adjMatrix[MAX][MAX];
-int visited[MAX];
-int queue[MAX], front = -1, rear = -1;
+int queue[max];
+int f = -1, r = -1;
 
-void enqueue(int vertex) {
-    if (rear == MAX - 1)
-        printf("\nQueue Overflow\n");
-    else {
-        if (front == -1)
-            front = 0;
-        queue[++rear] = vertex;
+int stackempty(){
+    if(top == -1){
+        return 0;
+    }
+    else{
+        return 1;
     }
 }
 
-int dequeue() {
-    int vertex;
-    if (front == -1 || front > rear) {
-        printf("\nQueue Underflow\n");
+void push(int a){
+    if(top == (max-1)){
+        printf("\nStack Overflow ");
+    }
+    else{
+        stack[++top] = a;
+    }
+}
+
+int pop(){
+    int a;
+    if(top == -1){
+        printf("\nStack underflow");
         return -1;
-    } else {
-        vertex = queue[front++];
-        if (front > rear) {
-            front = rear = -1;
-        }
-        return vertex;
     }
+    else{
+        a = stack[top--];
+    }
+    return a;
 }
 
-int isQueueEmpty() {
-    return (front == -1);
-}
+void DFS(int G[10][10], int n){
+    int visited[10] , v;
 
-void BFS(int startVertex, int numVertices) {
-    int i, currentVertex;
-    
-    for (i = 0; i < numVertices; i++)
+    for (int i = 1; i <= n; i++) {
         visited[i] = 0;
-    
-    enqueue(startVertex);
-    visited[startVertex] = 1;
-    
-    while (!isQueueEmpty()) {
-        currentVertex = dequeue();
-        printf("%d ", currentVertex);
-        
-        for (i = 0; i < numVertices; i++) {
-            if (adjMatrix[currentVertex][i] == 1 && !visited[i]) {
-                enqueue(i);
+    }
+
+    printf("\nEnter start vertex : ");
+    scanf("%d", &v);
+
+    visited[v] = 1;
+    push(v);
+
+    while(stackempty() != 0){
+        v = pop();
+        printf("-%d",v);
+
+        for(int i=1; i<=n; i++){
+            if(G[v][i] == 1 && visited[i] == 0){
                 visited[i] = 1;
+                push(i);
             }
         }
     }
 }
 
-void DFSUtil(int vertex, int numVertices) {
-    int i;
-    
-    printf("%d ", vertex);
-    visited[vertex] = 1;
-    
-    for (i = 0; i < numVertices; i++) {
-        if (adjMatrix[vertex][i] == 1 && !visited[i]) {
-            DFSUtil(i, numVertices);
+void nq(int c) {
+    if (r == n - 1) {
+        printf("\nQueue full\n");
+    } else {
+        if (f == -1) {
+            f = 0;
         }
+        r++;
+        queue[r] = c;
     }
 }
 
-void DFS(int startVertex, int numVertices) {
-    int i;
-    
-    for (i = 0; i < numVertices; i++)
-        visited[i] = 0;
-    
-    DFSUtil(startVertex, numVertices);
+int dq() {
+    int a = -1;
+    if (f == -1 || f > r) {
+        printf("Queue empty\n");
+    } else {
+       a = queue[f++];
+       if(f > r){
+        f = r = -1;
+       }
+    }
+    return a;
 }
 
-void displayAdjacencyMatrix(int numVertices) {
-    int i, j;
-    
-    printf("Adjacency Matrix:\n");
-    for (i = 0; i < numVertices; i++) {
-        for (j = 0; j < numVertices; j++) {
-            printf("%d ", adjMatrix[i][j]);
+int queueempty() {
+    if (r == -1 && f == -1) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+void BFS(int G[10][10], int n) {
+    int visited[10], v;
+
+    for (int i = 1; i <= n; i++) {
+        visited[i] = 0;
+    }
+
+    printf("\nEnter start vertex : ");
+    scanf("%d", &v);
+
+    nq(v);
+    visited[v] = 1;
+
+    while (queueempty() != 0) {
+        v = dq();
+        printf("-%d", v);
+
+        for (int i = 1; i <= n; i++) {
+            if (G[v][i] == 1 && visited[i] == 0) {
+                nq(i);
+                visited[i] = 1; 
+            }
         }
-        printf("\n");
     }
 }
 
 int main() {
-    int numVertices, numEdges, i, j, u, v, startVertex;
-    
-    printf("Enter the number of vertices: ");
-    scanf("%d", &numVertices);
+    int G[10][10];
+    int a, b, e;
 
-    // Initialize adjacency matrix to 0
-    for (i = 0; i < numVertices; i++) {
-        for (j = 0; j < numVertices; j++) {
-            adjMatrix[i][j] = 0;
+    printf("Enter the no of vertex : ");
+    scanf("%d", &n);
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            G[i][j] = 0;
         }
     }
-    
-    printf("Enter the number of edges: ");
-    scanf("%d", &numEdges);
-    
-    printf("Enter the edges (u v) format:\n");
-    for (i = 0; i < numEdges; i++) {
-        scanf("%d %d", &u, &v);
-        adjMatrix[u][v] = 1;
-        adjMatrix[v][u] = 1; // assuming it's an undirected graph
+
+    printf("\nEnter the no of edges : ");
+    scanf("%d", &e);
+
+    for (int i = 0; i < e; i++) {
+        printf("\nEnter edge : ");
+        scanf("%d %d", &a, &b);
+        G[a][b] = G[b][a] = 1;
     }
-    
-    // Display the adjacency matrix
-    displayAdjacencyMatrix(numVertices);
-    
-    printf("Enter the starting vertex for BFS and DFS: ");
-    scanf("%d", &startVertex);
-    
-    printf("BFS Traversal: ");
-    BFS(startVertex, numVertices);
-    printf("\n");
-    
-    printf("DFS Traversal: ");
-    DFS(startVertex, numVertices);
-    printf("\n");
-    
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            printf("%5d ", G[i][j]);
+        }
+        printf("\n");
+    }
+
+    int m;
+    while(1){
+        printf("\n\nEnter which traversal : ");
+        printf("\n\n1.DFS \n2. BFS \n3.exit\n");
+        scanf("%d",&m);
+        switch(m){
+            case 1:
+                DFS(G, n);
+                break;
+            case 2:
+                BFS(G,n);
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("\nEnter the  valid option.");
+        }
+    }
     return 0;
 }
