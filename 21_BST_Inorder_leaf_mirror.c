@@ -16,6 +16,21 @@ struct Node* createNode(int data) {
     return newNode;
 }
 
+// Function to insert a node into the BST
+struct Node* insertNode(struct Node* root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insertNode(root->left, data);
+    } else if (data > root->data) {
+        root->right = insertNode(root->right, data);
+    }
+
+    return root;
+}
+
 // Stack structure for non-recursive traversal
 struct Stack {
     int top;
@@ -56,31 +71,6 @@ struct Node* pop(struct Stack* stack) {
     return stack->array[stack->top--];
 }
 
-// Function to perform postorder traversal iteratively
-void postorderTraversal(struct Node* root) {
-    if (root == NULL)
-        return;
-
-    struct Stack* stack1 = createStack(100);
-    struct Stack* stack2 = createStack(100);
-    push(stack1, root);
-
-    while (!isEmpty(stack1)) {
-        struct Node* temp = pop(stack1);
-        push(stack2, temp);
-
-        if (temp->left)
-            push(stack1, temp->left);
-        if (temp->right)
-            push(stack1, temp->right);
-    }
-
-    while (!isEmpty(stack2)) {
-        struct Node* temp = pop(stack2);
-        printf("%d ", temp->data);
-    }
-}
-
 // Function to perform inorder traversal iteratively
 void inorderTraversal(struct Node* root) {
     if (root == NULL)
@@ -101,44 +91,29 @@ void inorderTraversal(struct Node* root) {
     }
 }
 
-// Function to perform preorder traversal iteratively
-void preorderTraversal(struct Node* root) {
+// Function to count leaf nodes of the tree
+int countLeafNodes(struct Node* root) {
     if (root == NULL)
-        return;
+        return 0;
 
     struct Stack* stack = createStack(100);
+    int leafCount = 0;
     push(stack, root);
 
     while (!isEmpty(stack)) {
         struct Node* temp = pop(stack);
-        printf("%d ", temp->data);
+
+        if (temp->left == NULL && temp->right == NULL) {
+            leafCount++;
+        }
 
         if (temp->right)
             push(stack, temp->right);
         if (temp->left)
             push(stack, temp->left);
     }
-}
 
-// Function to display leaf nodes of the tree
-void displayLeafNodes(struct Node* root) {
-    if (root == NULL)
-        return;
-
-    struct Stack* stack = createStack(100);
-    push(stack, root);
-
-    while (!isEmpty(stack)) {
-        struct Node* temp = pop(stack);
-
-        if (temp->left == NULL && temp->right == NULL)
-            printf("%d ", temp->data);
-
-        if (temp->right)
-            push(stack, temp->right);
-        if (temp->left)
-            push(stack, temp->left);
-    }
+    return leafCount;
 }
 
 // Function to mirror the binary tree
@@ -164,42 +139,48 @@ void mirrorTree(struct Node* root) {
 
 // Driver program
 int main() {
-    // Creating a sample binary tree
-    struct Node* root = createNode(1);
-    root->left = createNode(2);
-    root->right = createNode(3);
-    root->left->left = createNode(4);
-    root->left->right = createNode(5);
+    struct Node* root = NULL;
+    int choice, value, count;
 
-    printf("Postorder Traversal: ");
-    postorderTraversal(root);
-    printf("\n");
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Insert Node\n");
+        printf("2. Inorder Traversal\n");
+        printf("3. Display Number of Leaf Nodes\n");
+        printf("4. Mirror Image of Tree\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    printf("Inorder Traversal: ");
-    inorderTraversal(root);
-    printf("\n");
-
-    printf("Preorder Traversal: ");
-    preorderTraversal(root);
-    printf("\n");
-
-    printf("Leaf Nodes: ");
-    displayLeafNodes(root);
-    printf("\n");
-
-    printf("Mirror Image of Tree:\n");
-    mirrorTree(root);
-    printf("Postorder Traversal of Mirror Image: ");
-    postorderTraversal(root);
-    printf("\n");
-
-    printf("Inorder Traversal of Mirror Image: ");
-    inorderTraversal(root);
-    printf("\n");
-
-    printf("Preorder Traversal of Mirror Image: ");
-    preorderTraversal(root);
-    printf("\n");
+        switch (choice) {
+            case 1:
+                printf("Enter value to insert: ");
+                scanf("%d", &value);
+                root = insertNode(root, value);
+                break;
+            case 2:
+                printf("Inorder Traversal: ");
+                inorderTraversal(root);
+                printf("\n");
+                break;
+            case 3:
+                count = countLeafNodes(root);
+                printf("Number of Leaf Nodes: %d\n", count);
+                break;
+            case 4:
+                printf("Mirror Image of Tree:\n");
+                mirrorTree(root);
+                printf("Inorder Traversal of Mirror Image: ");
+                inorderTraversal(root);
+                printf("\n");
+                break;
+            case 5:
+                exit(0);
+                break;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    }
 
     return 0;
 }
