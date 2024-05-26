@@ -2,8 +2,7 @@
 #include<stdlib.h>
 
 #define max 100
-int stack[max],n;
-int top = -1;
+int n,top = -1;
 
 int queue[max];
 int f = -1, r = -1;
@@ -16,54 +15,6 @@ int stackempty(){
         return 1;
     }
 }
-
-void push(int a){
-    if(top == (max-1)){
-        printf("\nStack Overflow ");
-    }
-    else{
-        stack[++top] = a;
-    }
-}
-
-int pop(){
-    int a;
-    if(top == -1){
-        printf("\nStack underflow");
-        return -1;
-    }
-    else{
-        a = stack[top--];
-    }
-    return a;
-}
-
-void DFS(int G[10][10], int n){
-    int visited[10] , v;
-
-    for (int i = 1; i <= n; i++) {
-        visited[i] = 0;
-    }
-
-    printf("\nEnter start vertex : ");
-    scanf("%d", &v);
-
-    visited[v] = 1;
-    push(v);
-
-    while(stackempty() != 0){
-        v = pop();
-        printf("-%d",v);
-
-        for(int i=1; i<=n; i++){
-            if(G[v][i] == 1 && visited[i] == 0){
-                visited[i] = 1;
-                push(i);
-            }
-        }
-    }
-}
-
 void nq(int c) {
     if (r == n - 1) {
         printf("\nQueue full\n");
@@ -155,16 +106,13 @@ int main() {
     int m;
     while(1){
         printf("\n\nEnter which traversal : ");
-        printf("\n\n1.DFS \n2. BFS \n3.exit\n");
+        printf("\n\n1.BFS \n2.exit\n");
         scanf("%d",&m);
         switch(m){
             case 1:
-                DFS(G, n);
-                break;
-            case 2:
                 BFS(G,n);
                 break;
-            case 3:
+            case 2:
                 exit(0);
             default:
                 printf("\nEnter the  valid option.");
