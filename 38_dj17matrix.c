@@ -1,105 +1,16 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
 
-// Structure to represent a node in the adjacency list
-typedef struct AdjListNode {
-    int dest;
-    int weight;
-    struct AdjListNode* next;
-} AdjListNode;
-
-// Structure to represent an adjacency list
-typedef struct {
-    AdjListNode* head;
-} AdjList;
-
-// Structure to represent the graph
-typedef struct {
-    int V;
-    AdjList* array;
-} Graph;
-
-// Function to create a new adjacency list node
-AdjListNode* newAdjListNode(int dest, int weight) {
-    AdjListNode* newNode = (AdjListNode*)malloc(sizeof(AdjListNode));
-    newNode->dest = dest;
-    newNode->weight = weight;
-    newNode->next = NULL;
-    return newNode;
-}
-
-// Function to create a graph with V vertices
-Graph* createGraph(int V) {
-    Graph* graph = (Graph*)malloc(sizeof(Graph));
-    graph->V = V;
-    graph->array = (AdjList*)malloc(V * sizeof(AdjList));
-    for (int i = 0; i < V; ++i)
-        graph->array[i].head = NULL;
-    return graph;
-}
-
-// Function to add an edge to the graph
-void addEdge(Graph* graph, int src, int dest, int weight) {
-    AdjListNode* newNode = newAdjListNode(dest, weight);
-    newNode->next = graph->array[src].head;
-    graph->array[src].head = newNode;
-
-    newNode = newAdjListNode(src, weight);
-    newNode->next = graph->array[dest].head;
-    graph->array[dest].head = newNode;
-}
-
-// Function to print the adjacency matrix representation of the graph
-void printAdjacencyMatrix(Graph* graph) {
-    printf("Adjacency Matrix Representation of the Graph:\n");
-    for (int i = 0; i < graph->V; ++i) {
-        for (int j = 0; j < graph->V; ++j) {
-            int found = 0;
-            AdjListNode* pCrawl = graph->array[i].head;
-            while (pCrawl != NULL) {
-                if (pCrawl->dest == j) {
-                    printf("%d ", pCrawl->weight);
-                    found = 1;
-                    break;
-                }
-                pCrawl = pCrawl->next;
-            }
-            if (!found)
-                printf("0 ");
-        }
-        printf("\n");
-    }
-}
-
-// Function to find the vertex with the minimum distance value, from the set of vertices not yet included in shortest path tree
-int minDistance(int dist[], int sptSet[], int V) {
-    int min = INT_MAX, min_index;
-
-    for (int v = 0; v < V; v++)
-        if (sptSet[v] == 0 && dist[v] <= min)
-            min = dist[v], min_index = v;
-
-    return min_index;
-}
-
-// Function to print the constructed distance array
-void printSolution(int dist[], int V) {
-    printf("Vertex   Distance from Source\n");
-    for (int i = 0; i < V; i++)
-        printf("%d \t\t %d\n", i, dist[i]);
-}
+#define MAX_VERTICES 100
+#define INF 99999
 
 // Function to implement Dijkstra's algorithm to find shortest paths from source to all other vertices
-void dijkstra(Graph* graph, int src) {
-    int V = graph->V;
-    int dist[V]; // The output array. dist[i] will hold the shortest distance from src to i
-
-    int sptSet[V]; // sptSet[i] will be true if vertex i is included in shortest path tree or shortest distance from src to i is finalized
+void dijkstra(int graph[MAX_VERTICES][MAX_VERTICES], int V, int src) {
+    int dist[MAX_VERTICES]; // The output array. dist[i] will hold the shortest distance from src to i
+    int sptSet[MAX_VERTICES]; // sptSet[i] will be true if vertex i is included in shortest path tree or shortest distance from src to i is finalized
 
     // Initialize all distances as INFINITE and stpSet[] as false
     for (int i = 0; i < V; i++) {
-        dist[i] = INT_MAX;
+        dist[i] = INF;
         sptSet[i] = 0;
     }
 
@@ -110,23 +21,29 @@ void dijkstra(Graph* graph, int src) {
     for (int count = 0; count < V - 1; count++) {
         // Pick the minimum distance vertex from the set of vertices not yet processed.
         // u is always equal to src in the first iteration.
-        int u = minDistance(dist, sptSet, V);
+        int minDist = INF, u;
+
+        for (int v = 0; v < V; v++) {
+            if (!sptSet[v] && dist[v] <= minDist) {
+                minDist = dist[v];
+                u = v;
+            }
+        }
 
         // Mark the picked vertex as processed
         sptSet[u] = 1;
 
         // Update dist value of the adjacent vertices of the picked vertex
-        for (AdjListNode* pCrawl = graph->array[u].head; pCrawl != NULL; pCrawl = pCrawl->next) {
-            int v = pCrawl->dest;
-
-            // Update dist[v] only if is not in sptSet, there is an edge from u to v, and total weight of path from src to v through u is smaller than current value of dist[v]
-            if (!sptSet[v] && pCrawl->weight && dist[u] != INT_MAX && dist[u] + pCrawl->weight < dist[v])
-                dist[v] = dist[u] + pCrawl->weight;
+        for (int v = 0; v < V; v++) {
+            if (!sptSet[v] && graph[u][v] && dist[u] != INF && dist[u] + graph[u][v] < dist[v])
+                dist[v] = dist[u] + graph[u][v];
         }
     }
 
     // Print the constructed distance array
-    printSolution(dist, V);
+    printf("Vertex   Distance from Source\n");
+    for (int i = 0; i < V; i++)
+        printf("%d \t\t %d\n", i, dist[i]);
 }
 
 int main() {
@@ -136,22 +53,31 @@ int main() {
     printf("Enter the number of edges in the graph: ");
     scanf("%d", &E);
 
-    Graph* graph = createGraph(V);
+    int graph[MAX_VERTICES][MAX_VERTICES] = {0};
 
     printf("Enter edges and weights (source destination weight):\n");
     for (int i = 0; i < E; ++i) {
         scanf("%d %d %d", &src, &dest, &weight);
-        addEdge(graph, src, dest, weight);
+        graph[src][dest] = weight;
+        graph[dest][src] = weight; // Undirected graph, so both directions need to be updated
     }
 
-    printf("Graph (Adjacency List Representation):\n");
-    printAdjacencyMatrix(graph);
+    printf("\nAdjacency Matrix Representation of the Graph:\n");
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (graph[i][j] == 0)
+                printf("0 ");
+            else
+                printf("%d ", graph[i][j]);
+        }
+        printf("\n");
+    }
 
     printf("\nEnter the source vertex: ");
     scanf("%d", &src);
 
     printf("Shortest distances from source vertex %d:\n", src);
-    dijkstra(graph, src);
+    dijkstra(graph, V, src);
 
     return 0;
 }
