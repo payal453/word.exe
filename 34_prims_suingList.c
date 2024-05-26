@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 
-#define MAX_VERTICES 100
+#define MAX_VERTICES 100 
 
 struct node {
     int vertex;
@@ -10,10 +10,11 @@ struct node {
 };
 
 struct node *A[MAX_VERTICES];
-int parent[MAX_VERTICES];
 
+// Using List starts here  :  
 int mindist(int a[], int b[], int n) {
     int min = 999, ind = -1;
+
     for (int i = 0; i < n; i++) {
         if (!b[i] && a[i] < min) {
             min = a[i];
@@ -30,22 +31,23 @@ void display(int parent[], int n) {
     }
 }
 
-void prims(int n, int start_vertex) {
+void prims(int n) {
     int visited[n];
-    int dist[n], u;
+    int dist[n], parent[n], u;  
 
     for (int i = 0; i < n; i++) {
-        visited[i] = 0;
+        visited[i] = 0; 
         parent[i] = -1;
         dist[i] = 999;
     }
 
-    dist[start_vertex] = 0;
+    dist[0] = 0;
     for (int i = 0; i < n - 1; i++) {
-        u = mindist(dist, visited, n);
+        u = mindist(dist, visited, n); 
         visited[u] = 1;
 
         struct node *temp = A[u];
+
         while (temp != NULL) {
             int v = temp->vertex;
             int weight = temp->weight;
@@ -56,37 +58,24 @@ void prims(int n, int start_vertex) {
             temp = temp->next;
         }
     }
-    display(parent, n);
+    display(parent, n); 
 }
 
-void displayGraph(int n) {
-    printf("\nAdjacency List:\n");
-    for (int i = 0; i < n; i++) {
-        struct node *p = A[i];
-        printf("%d: ", i);
-        while (p != NULL) {
-            printf("(%d, %d) -> ", p->vertex, p->weight);
-            p = p->next;
-        }
-        printf("NULL\n");
-    }
-}
-
-int main() {
-    int u, v, w, n, start_vertex;
+int list(){
+    int u, v, w, n;
     char ch;
-    printf("Enter the number of vertices: ");
+    printf("Enter the number of vertices : ");
     scanf("%d", &n);
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++){
         A[i] = NULL;
     }
 
     struct node *new;
-    do {
-        printf("\nEnter edge: ");
+    do{
+        printf("\nEnter edge : ");
         scanf("%d %d", &u, &v);
-        printf("\nEnter weight from edge %d to %d: ", u, v);
+        printf("\nEnter weight from edge %d to %d :  ", u, v);
         scanf("%d", &w);
 
         new = (struct node *)malloc(sizeof(struct node));
@@ -101,24 +90,34 @@ int main() {
         new->next = A[v];
         A[v] = new;
 
-        printf("\nDo you want to enter more edges (y/n): ");
+        printf("\nDo you want to enter more edges (y/n) : ");
         scanf(" %c", &ch);
     } while (ch == 'y' || ch == 'Y');
 
-    displayGraph(n);
+    printf("\nAdjacency List:\n");
+    for (int i = 0; i < n; i++) {
+        struct node *p = A[i];
+        printf("%d: ", i);
+        while (p != NULL) {
+            printf("(%d, %d) -> ", p->vertex, p->weight);
+            p = p->next;
+        }
+        printf("NULL\n");
+    }
 
-    printf("Enter the start vertex for Prim's algorithm: ");
-    scanf("%d", &start_vertex);
+    return n;
+}
 
-    int m;
-    while (1) {
-        printf("\n\n\t** MST Using Adjacency list using Prim's algorithm");
-        printf("\n1. Prim's \n2. Exit\n");
-        printf("\nEnter which algorithm: ");
-        scanf("%d", &m);
-        switch (m) {
+int main() { 
+    int m,f;
+    while(1){
+        printf("\n1.Prims using Adjacency List \n2.Exit \n");
+        printf("\nEnter which algorithm : ");
+        scanf("%d",&m);
+        switch(m){
             case 1:
-                prims(n, start_vertex);
+                f = list();
+                prims(f);
                 break;
             case 2:
                 exit(0);
@@ -126,5 +125,6 @@ int main() {
                 printf("\nEnter a valid option.");
         }
     }
+
     return 0;
 }
