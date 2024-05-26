@@ -1,8 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 
-#define MAX_VERTICES 100 
+#define MAX_VERTICES 100
 
+int parent[MAX_VERTICES];
 struct node {
     int vertex;
     int weight;
@@ -10,7 +11,6 @@ struct node {
 };
 
 struct node *A[MAX_VERTICES];
-int parent[MAX_VERTICES];
 
 int findpar(int i) {
     if (parent[i] == i) {
@@ -31,7 +31,7 @@ void kruskal(int v) {
     for (int i = 0; i < v; i++) {
         parent[i] = i;
     }
-
+    printf("\n");
     while (n < v - 1) {
         min = 999;
         for (int i = 0; i < v; i++) {
@@ -51,7 +51,7 @@ void kruskal(int v) {
     }
 }
 
-int main(){
+int list(){
     int u, v, w, n;
     char ch;
     printf("Enter the number of vertices : ");
@@ -84,16 +84,30 @@ int main(){
         scanf(" %c", &ch);
     } while (ch == 'y' || ch == 'Y');
 
-    
-    int m;
+    printf("\nAdjacency List would be : \n ");
+    for (int i = 0; i < n; i++) {
+        struct node *temp = A[i];
+        printf("%d: ", i);
+        while (temp != NULL) {
+            printf("-> (%d, %d) ", temp->vertex, temp->weight);
+            temp = temp->next;
+        }
+        printf("\n");
+    }
+
+    return n;
+}
+
+int main() { 
+    int m,f;
     while(1){
-        printf("\n\n\t** MST Using Adjacency list using Kruskal algorithm");
-        printf("\n1.Kruskal \n2.Exit\n");
+        printf("\n1.Kruskal using Adjacency List \n2.Exit \n");
         printf("\nEnter which algorithm : ");
         scanf("%d",&m);
         switch(m){
             case 1:
-                kruskal(n);
+                f = list();
+                kruskal(f);
                 break;
             case 2:
                 exit(0);
@@ -101,5 +115,6 @@ int main(){
                 printf("\nEnter a valid option.");
         }
     }
+
     return 0;
 }
