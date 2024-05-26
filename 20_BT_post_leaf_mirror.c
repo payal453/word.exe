@@ -79,6 +79,7 @@ void postorderTraversal(struct Node* root) {
         struct Node* temp = pop(stack2);
         printf("%d ", temp->data);
     }
+    printf("\n");
 }
 
 // Function to perform inorder traversal iteratively
@@ -99,6 +100,7 @@ void inorderTraversal(struct Node* root) {
         printf("%d ", current->data);
         current = current->right;
     }
+    printf("\n");
 }
 
 // Function to perform preorder traversal iteratively
@@ -118,6 +120,7 @@ void preorderTraversal(struct Node* root) {
         if (temp->left)
             push(stack, temp->left);
     }
+    printf("\n");
 }
 
 // Function to display leaf nodes of the tree
@@ -139,6 +142,7 @@ void displayLeafNodes(struct Node* root) {
         if (temp->left)
             push(stack, temp->left);
     }
+    printf("\n");
 }
 
 // Function to mirror the binary tree
@@ -171,35 +175,47 @@ int main() {
     root->left->left = createNode(4);
     root->left->right = createNode(5);
 
-    printf("Postorder Traversal: ");
-    postorderTraversal(root);
-    printf("\n");
+    int choice;
+    while (1) {
+        printf("Menu:\n");
+        printf("1. Postorder Traversal\n");
+        printf("2. Inorder Traversal\n");
+        printf("3. Preorder Traversal\n");
+        printf("4. Display Leaf Nodes\n");
+        printf("5. Mirror the Tree\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    printf("Inorder Traversal: ");
-    inorderTraversal(root);
-    printf("\n");
-
-    printf("Preorder Traversal: ");
-    preorderTraversal(root);
-    printf("\n");
-
-    printf("Leaf Nodes: ");
-    displayLeafNodes(root);
-    printf("\n");
-
-    printf("Mirror Image of Tree:\n");
-    mirrorTree(root);
-    printf("Postorder Traversal of Mirror Image: ");
-    postorderTraversal(root);
-    printf("\n");
-
-    printf("Inorder Traversal of Mirror Image: ");
-    inorderTraversal(root);
-    printf("\n");
-
-    printf("Preorder Traversal of Mirror Image: ");
-    preorderTraversal(root);
-    printf("\n");
+        switch (choice) {
+            case 1:
+                printf("Postorder Traversal: ");
+                postorderTraversal(root);
+                break;
+            case 2:
+                printf("Inorder Traversal: ");
+                inorderTraversal(root);
+                break;
+            case 3:
+                printf("Preorder Traversal: ");
+                preorderTraversal(root);
+                break;
+            case 4:
+                printf("Leaf Nodes: ");
+                displayLeafNodes(root);
+                break;
+            case 5:
+                mirrorTree(root);
+                printf("Tree has been mirrored.\n");
+                break;
+            case 6:
+                printf("Exiting...\n");
+                exit(0);
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
 
     return 0;
 }
