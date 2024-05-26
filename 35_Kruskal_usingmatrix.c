@@ -1,99 +1,92 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 
-#define MAX_VERTICES 100 
+#define MAX_VERTICES 100
 
-struct node {
-    int vertex;
-    int weight;
-    struct node *next;
-};
-
-struct node *A[MAX_VERTICES];
 int parent[MAX_VERTICES];
+int G[MAX_VERTICES][MAX_VERTICES];
 
-int findpar(int i) {
-    if (parent[i] == i) {
-        return i;
+int findparmatrix(int i) {
+    while (i != parent[i]) {
+        i = parent[i];
     }
-    return findpar(parent[i]);
+    return i;
 }
 
-void uni(int a, int b) {
-    int x = findpar(a);
-    int y = findpar(b);
-    parent[x] = y;
+void unimatrix(int a, int b) {
+    int i, j;
+    i = findparmatrix(a);
+    j = findparmatrix(b);
+
+    parent[j] = i;
 }
 
-void kruskal(int v) {
-    int n = 0, a, b, min;
+void kruskalmatrix(int G[][MAX_VERTICES], int v) {
+    int min1, n1 = 1,a,b;
 
-    for (int i = 0; i < v; i++) {
+    for (int i = 0; i < v; i++)
         parent[i] = i;
-    }
 
-    while (n < v - 1) {
-        min = 999;
+    while (n1 < v) {
+        min1 = 999;
         for (int i = 0; i < v; i++) {
-            struct node *temp = A[i];
-            while (temp != NULL) {
-                if (temp->weight < min && findpar(i) != findpar(temp->vertex)) {
+            for (int j = 0; j < v; j++) {
+                if (G[i][j] < min1 && findparmatrix(i) != findparmatrix(j)) {
                     a = i;
-                    b = temp->vertex;
-                    min = temp->weight;
+                    b = j;
+                    min1 = G[i][j];
                 }
-                temp = temp->next;
             }
         }
-        uni(a, b);
-        printf("Edge %d-%d : Weight = %d\n", a, b, min);
-        n++;
+        unimatrix(a, b);
+        printf("Edge %d-%d : Weight = %d\n", a, b, min1);
+        n1++;
     }
 }
 
-int main(){
-    int u, v, w, n;
-    char ch;
-    printf("Enter the number of vertices : ");
-    scanf("%d", &n);
+int matrix(){
+    int v, e, a, b, w;
+    printf("\nEnter the number of vertices: ");
+    scanf("%d", &v);
 
-    for (int i = 0; i < n; i++){
-        A[i] = NULL;
+    for (int i = 0; i < v; i++) {
+        for (int j = 0; j < v; j++) {
+            G[i][j] = 999;
+        }
     }
 
-    struct node *new;
-    do{
-        printf("\nEnter edge : ");
-        scanf("%d %d", &u, &v);
-        printf("\nEnter weight from edge %d to %d :  ", u, v);
+    printf("\nEnter the number of edges: ");
+    scanf("%d", &e);
+
+    for (int i = 0; i < e; i++) {
+        printf("\nEnter edge: ");
+        scanf("%d %d", &a, &b);
+        printf("Enter weight from edge %d to %d: ", a, b);
         scanf("%d", &w);
+        G[a][b] = G[b][a] = w;
+    }
 
-        new = (struct node *)malloc(sizeof(struct node));
-        new->vertex = v;
-        new->weight = w;
-        new->next = A[u];
-        A[u] = new;
+    printf("\nAdjacency matrix:\n");
+    for (int i = 0; i < v; i++) {
+        for (int j = 0; j < v; j++) {
+            printf("%5d ", G[i][j]);
+        }
+        printf("\n");
+    }
 
-        new = (struct node *)malloc(sizeof(struct node));
-        new->vertex = u;
-        new->weight = w;
-        new->next = A[v];
-        A[v] = new;
+    return v;
+}
 
-        printf("\nDo you want to enter more edges (y/n) : ");
-        scanf(" %c", &ch);
-    } while (ch == 'y' || ch == 'Y');
-
-    
-    int m;
+int main() { 
+    int m,f;
     while(1){
-        printf("\n\n\t** MST Using Adjacency list using Kruskal algorithm");
-        printf("\n1.Kruskal \n2.Exit\n");
+        printf("\n1.Kruskal Algorithm using matrix \n2.Exit \n");
         printf("\nEnter which algorithm : ");
         scanf("%d",&m);
         switch(m){
             case 1:
-                kruskal(n);
+                f = matrix();
+                kruskalmatrix(G,f);
                 break;
             case 2:
                 exit(0);
@@ -101,5 +94,6 @@ int main(){
                 printf("\nEnter a valid option.");
         }
     }
+
     return 0;
 }
