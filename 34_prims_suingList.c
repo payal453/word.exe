@@ -30,7 +30,7 @@ void display(int parent[], int n) {
     }
 }
 
-void prims(int n) {
+void prims(int n, int start_vertex) {
     int visited[n];
     int dist[n], u;
 
@@ -40,7 +40,7 @@ void prims(int n) {
         dist[i] = 999;
     }
 
-    dist[0] = 0;
+    dist[start_vertex] = 0;
     for (int i = 0; i < n - 1; i++) {
         u = mindist(dist, visited, n);
         visited[u] = 1;
@@ -73,7 +73,7 @@ void displayGraph(int n) {
 }
 
 int main() {
-    int u, v, w, n;
+    int u, v, w, n, start_vertex;
     char ch;
     printf("Enter the number of vertices: ");
     scanf("%d", &n);
@@ -107,6 +107,9 @@ int main() {
 
     displayGraph(n);
 
+    printf("Enter the start vertex for Prim's algorithm: ");
+    scanf("%d", &start_vertex);
+
     int m;
     while (1) {
         printf("\n\n\t** MST Using Adjacency list using Prim's algorithm");
@@ -115,7 +118,7 @@ int main() {
         scanf("%d", &m);
         switch (m) {
             case 1:
-                prims(n);
+                prims(n, start_vertex);
                 break;
             case 2:
                 exit(0);
