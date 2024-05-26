@@ -81,18 +81,31 @@ void DFS(struct node *A[], int n) {
     }
 }
 
-int main(){
-    int u, v,n;
+void displayGraph(struct node *A[], int n) {
+    printf("\nAdjacency List:\n");
+    for (int i = 1; i <= n; i++) {
+        struct node *p = A[i];
+        printf("%d: ", i);
+        while (p != NULL) {
+            printf("%d -> ", p->data);
+            p = p->next;
+        }
+        printf("NULL\n");
+    }
+}
+
+int main() {
+    int u, v, n;
     char ch;
     printf("Enter the no of vertex : ");
     scanf("%d", &n);
 
-    for (int i = 1; i <= n; i++){
+    for (int i = 1; i <= n; i++) {
         A[i] = NULL;
     }
 
     struct node *new, *p;
-    do{
+    do {
         printf("\nEnter edge :");
         scanf("%d %d", &u, &v);
 
@@ -101,26 +114,24 @@ int main(){
         new->next = NULL;
         p = A[u];
 
-        if (p == NULL){
+        if (p == NULL) {
             A[u] = new;
-        }
-        else{
-            while (p->next != NULL){
+        } else {
+            while (p->next != NULL) {
                 p = p->next;
             }
             p->next = new;
         }
+
         new = (struct node *)malloc(sizeof(struct node));
         new->data = u;
         new->next = NULL;
         p = A[v];
 
-        if (p == NULL){
+        if (p == NULL) {
             A[v] = new;
-        }
-        else{
-            while (p->next != NULL)
-            {
+        } else {
+            while (p->next != NULL) {
                 p = p->next;
             }
             p->next = new;
@@ -129,6 +140,7 @@ int main(){
         scanf(" %c", &ch);
     } while (ch == 'y' || ch == 'Y');
 
+    displayGraph(A, n);
     DFS(A, n);
     return 0;
 }
