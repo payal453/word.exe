@@ -9,11 +9,11 @@ struct Node {
 
 // Definition of the stack using a doubly linked list
 typedef struct Stack {
-    Node* top; 
+    struct Node* top; 
 } Stack;
 
-Node* createNode(int data) {
-    Node* newNode = (Node*)malloc(sizeof(Node));
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(Node));
     if (!newNode) {
         printf("Memory allocation error\n");
         return NULL;
@@ -29,7 +29,7 @@ void initializeStack(Stack* stack) {
 }
 
 void push(Stack* stack, int data) {
-    Node* newNode = createNode(data);
+    struct Node* newNode = createNode(data);
     if (!newNode) {
         return;
     }
@@ -48,7 +48,7 @@ int pop(Stack* stack) {
         printf("Stack Underflow\n");
         return -1;
     }
-    Node* temp = stack->top;
+    struct Node* temp = stack->top;
     int poppedData = temp->data;
     stack->top = stack->top->next;
     if (stack->top != NULL) {
@@ -60,7 +60,7 @@ int pop(Stack* stack) {
 }
 
 void displayStack(Stack* stack) {
-    Node* current = stack->top;
+    struct Node* current = stack->top;
     if (current == NULL) {
         printf("Stack is empty\n");
         return;
