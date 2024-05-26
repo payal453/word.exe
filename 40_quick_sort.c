@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-int count=0;
+
+int count = 0;
+
 struct emp {
     int emp_no;
     char name[10];
@@ -15,16 +17,16 @@ void swap(struct emp *p, struct emp *p1) {
 }
 
 int partition(struct emp *arr, int low, int high) {
-    int pivot = low;
+    int pivot = arr[low].emp_no;  // Use the value at arr[low] as pivot
     int i = low + 1;
     int j = high;
 
     while (i <= j) {
-        while (i <= high && arr[i].emp_no <= arr[pivot].emp_no) {
+        while (i <= high && arr[i].emp_no <= pivot) {
             i++;
         }
 
-        while (arr[j].emp_no > arr[pivot].emp_no) {
+        while (arr[j].emp_no > pivot) {
             j--;
         }
 
@@ -33,7 +35,7 @@ int partition(struct emp *arr, int low, int high) {
         }
     }
 
-    swap(&arr[pivot], &arr[j]);
+    swap(&arr[low], &arr[j]);
 
     return j;
 }
@@ -49,27 +51,30 @@ void quicksort(struct emp *arr, int low, int high) {
 
 int main() {
     int n;
-    printf("Enter how many entry do you want to add :");
-    scanf("%d",&n);
+    printf("Enter how many entries do you want to add: ");
+    scanf("%d", &n);
 
     struct emp *s = malloc(n * sizeof(struct emp));
 
     for (int i = 0; i < n; i++) {
-        printf("Enter emp_no no: ");
+        printf("\nEnter %d Employe's details :\n",i+1);
+        printf("Enter emp_no: ");
         scanf("%d", &s[i].emp_no);
         printf("Enter Name: ");
         scanf("%s", s[i].name);
         printf("Enter Salary: ");
-        scanf("%d", s[i].salary);
+        scanf("%d", &s[i].salary);
     }
 
     quicksort(s, 0, n - 1);
-    printf("Sorted: \n");
+
+    printf("\nSorted details :\n");
 
     for (int i = 0; i < n; i++) {
-        printf("emp_no no: %d\n", s[i].emp_no);
-        printf("Name: %s\n", s[i].name);
-        printf("Salary: %d\n", s[i].salary);
+        printf("emp_no: %d", s[i].emp_no);
+        printf("\tName: %s", s[i].name);
+        printf("\tSalary: %d", s[i].salary);
+        printf("\n");
     }
 
     printf("\nThe number of swaps performed: %d\n", count);
