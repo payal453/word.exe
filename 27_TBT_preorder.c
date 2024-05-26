@@ -1,218 +1,114 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-struct node {
-   int data;
-   struct node *left,*right;
-   int lbit,rbit;
+struct node{
+    int val;
+    int lbit; 
+    int rbit;
+    struct node *left, *right;
 };
-struct node *create(struct node *root,struct node *newnode);
-struct node *insert(struct node *root, int data);
 
-struct node *head=NULL;   
-
-
-struct node *insert(struct node *root, int data)
-{
-    
-    struct node *newnode;
- 
-    newnode = (struct node*)malloc(sizeof(struct node));
-    newnode->data = data;
-    newnode->rbit = newnode->lbit = 0;
-    newnode->left = newnode->right = NULL;
-
-    if(root==NULL)
-    {
-        root = newnode;
-        head = (struct node*)malloc(sizeof(struct node));
-        head->data = 100;
-        head->rbit = 1;
-        head->right = head;
-        head->left = newnode;
+struct node* insertTBT(struct node *head, int data){
+    struct node *temp,*p;
+    temp = (struct node*)malloc(sizeof(struct node));
+    temp->lbit = temp->rbit = 0;
+    temp->val = data;
+    if(head->lbit == 0){
+        head->left = temp;
+        temp->left = temp->right = head;
         head->lbit = 1;
-        root->right  = root->left= head;
-        return root;
+        return head;
     }
-    else
-    {
-        root = create(root,newnode);
-    }
-   return root;
-}
+    p = head->left;
 
-struct node *create(struct node *root,struct node *newnode)
-{
-     if(root->data >newnode-> data)
-     {
-        if(root->lbit==0)
-        {
-
-            newnode->right = root;
-            newnode->left = root->left;
-            root->left = newnode;
-            root->lbit = 1;
-        }else
-        {
-            root->left = create(root->left,newnode);
+    while(1){
+        if(data < p->val && p->lbit == 1){
+            p = p->left;
         }
-     }
-     if(root->data < newnode->data)
-     {
-        if(root->rbit==0)
-        {
-            newnode ->left= root;
-            newnode->right = root->right;
-            root->right = newnode;
-            root ->rbit = 1;
-
-        }else
-        {
-            root->right = create(root->right,newnode);
+        else if(data > p->val && p->rbit == 1){
+            p = p->right;
         }
-     }
-     return root;
-
-
-}
-
-
-void inOrderTraversal(struct node* root) {
-      struct node* current = root;
-
-    // Find the leftmost node
-    while (current->lbit == 1)
-       { current = current->left;}
-
-    // Traverse the tree in inorder manner
-    while (current != head) {
-        printf("%d ", current->data);
-
-        // If right pointer is threaded, move to its successo
-        if (current->rbit == 0)
-            current = current->right;
-        else {
-            current = current->right;
-            // Find the leftmost node of the right subtree
-            while (current != NULL && current->lbit == 1)
-                current = current->left;
+        else{
+            break;
         }
     }
+
+    if(data < p->val){
+        temp->right = p;
+        temp->left = p->left;
+        p->left = temp;
+        p->lbit = 1;
+    }
+
+    if(data > p->val){
+        temp->left = p;
+        temp->right = p->right;
+        p->right = temp;
+        p->rbit = 1;
+    }
+    return head;
 }
 
-void inorder(struct node *root)
-{
-    struct node *temp = root;
-    while(temp->lbit==1)
-    {
-        temp = temp->left;
-    }
-    while(temp!=head)
-     {
-        printf("%d ",temp->data);
-        if(temp->rbit==0)
-        {
+void preorderTBT(struct node *root){
+    struct node *temp = root->left;
+    while(temp != root){
+        printf("%d-",temp->val);
+        if (temp->lbit == 1) {
+            temp = temp->left;
+        }
+        else if(temp->rbit == 1){
             temp = temp->right;
         }
-        else
-        {
+        else{
+            while(temp->rbit == 0){
+                temp = temp->right;
+            }
             temp = temp->right;
-            while(temp!=head && temp->lbit==1)
-            {
-                temp = temp->left;
-            }
-        }
-     }
-}
-
-void preOrderTraversal(struct node* root) {
-    struct node* current = root;
-
-    while (current != head) {
-        // Print the current node
-        printf("%d ", current->data);
-        // If left pointer is threaded, move to its successor
-        if (current->lbit == 1)
-            current = current->left;
-        else if (current->rbit == 1)
-                current = current->right;
-        else if (current->rbit == 0)
-            {    while(current->rbit == 0)
-                {
-                    current = current->right;
-                }  
-            
-                current = current->right;}
-        }
-    }
-
-    void preorder(struct node* root)
-    {
-        struct node *temp =root;
-        while(temp!=head)
-        {
-            printf("%d ",temp->data);
-            if(temp->lbit==1)
-            {
-                temp = temp->left;
-            }
-            else if(temp->rbit==1)
-            {
-                temp = temp->right;
-            }
-            else if(temp->rbit==0)
-            {
-                while(temp->rbit==0)
-                {
-                    temp = temp->right;
-                }
-                temp = temp->right;
-            }
-        }
-    }
-
-    void postorder(struct node* root) {
-     struct node* current = root;
-    struct node* prev = NULL;
-
-    // Find the leftmost node
-    while (current->lbit == 1)
-        current = current->left;
-
-    // Traverse the tree in postorder manner
-    while (current != NULL) {
-        // If right pointer is threaded, move to its predecessor
-        if (current->rbit == 1 || current->right == prev) {
-            printf("%d ", current->data);
-            prev = current;
-            current = current->right;
-        } else {
-            // Move to the right child
-            if (current->right != NULL)
-                current = current->right;
-            // Move to the leftmost node of the right subtree
-            while (current->lbit == 0 && current->left != prev)
-                current = current->left;
-            if (current->left != prev)
-                current = current->left;
         }
     }
 }
 
-int main() {
-    struct node *root = NULL;
-    int n;
+int main(){
     int data;
-    printf("Enter size : ");
-    scanf("%d",&n);
-    for(int i=0;i<n;i++)
-    {   printf("Enter data : ");
-        scanf("%d",&data);
-      root = insert(root,data);
-    }
-   
-    inorder(root);
-    printf("\n");
-    preorder(root);
+    struct node* head = (struct node*)malloc(sizeof(struct node));
+    head->lbit = 0;
+    head->rbit = 1;
+    head->left = head->right = head;
 
+    int choice;
+    int x;
+    
+    while(1) {
+        printf("\n\n\t Threaded Binary Tree Menu:\n\n");
+        printf("1. Create TBT\n");
+        printf("2. Insert node \n");
+        printf("3. Preorder Traversal\n");
+        printf("4. Exit\n");
+        printf("\n\nEnter your choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                printf("Enter the how many nodes :");
+                scanf("%d",&x);
+                break;
+            case 2:
+                printf("\nEnter the data : ");
+                for(int i=0; i<x; i++){
+                    scanf("%d",&data);
+                    head = insertTBT(head, data);
+                }
+                break;
+            case 3:
+                printf("\nPreorder Traversal: ");
+                preorderTBT(head);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    }
+    return 0;
 }
