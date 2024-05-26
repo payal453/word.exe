@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 
 #define MAX_VERTICES 100
 
@@ -22,7 +22,7 @@ void unimatrix(int a, int b) {
 }
 
 void kruskalmatrix(int G[][MAX_VERTICES], int v) {
-    int min1, n1 = 1,a,b;
+    int min1, n1 = 1, a, b;
 
     for (int i = 0; i < v; i++)
         parent[i] = i;
@@ -44,14 +44,28 @@ void kruskalmatrix(int G[][MAX_VERTICES], int v) {
     }
 }
 
-int matrix(){
-    int v, e, a, b, w;
+void displayGraph(int G[][MAX_VERTICES], int v) {
+    printf("\nAdjacency matrix:\n");
+    for (int i = 0; i < v; i++) {
+        for (int j = 0; j < v; j++) {
+            if (G[i][j] == 999) {
+                printf("  INF "); // Print INF for no connection
+            } else {
+                printf("%5d ", G[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+int matrix() {
+    int v, e, a, b, w, start_vertex;
     printf("\nEnter the number of vertices: ");
     scanf("%d", &v);
 
     for (int i = 0; i < v; i++) {
         for (int j = 0; j < v; j++) {
-            G[i][j] = 999;
+            G[i][j] = 999; // Initialize with high value (representing infinity)
         }
     }
 
@@ -66,27 +80,24 @@ int matrix(){
         G[a][b] = G[b][a] = w;
     }
 
-    printf("\nAdjacency matrix:\n");
-    for (int i = 0; i < v; i++) {
-        for (int j = 0; j < v; j++) {
-            printf("%5d ", G[i][j]);
-        }
-        printf("\n");
-    }
+    printf("\nEnter the start vertex (though it won't affect Kruskal's algorithm): ");
+    scanf("%d", &start_vertex);
+
+    displayGraph(G, v); // Display the graph as an adjacency matrix
 
     return v;
 }
 
-int main() { 
-    int m,f;
-    while(1){
-        printf("\n1.Kruskal Algorithm using matrix \n2.Exit \n");
-        printf("\nEnter which algorithm : ");
-        scanf("%d",&m);
-        switch(m){
+int main() {
+    int m, f;
+    while (1) {
+        printf("\n1. Kruskal Algorithm using matrix \n2. Exit \n");
+        printf("\nEnter which algorithm: ");
+        scanf("%d", &m);
+        switch (m) {
             case 1:
                 f = matrix();
-                kruskalmatrix(G,f);
+                kruskalmatrix(G, f);
                 break;
             case 2:
                 exit(0);
